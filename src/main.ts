@@ -1,6 +1,8 @@
 import { defaultWindowIcon } from "@tauri-apps/api/app";
+import { LogicalSize } from "@tauri-apps/api/dpi";
 import { Menu, MenuItem, PredefinedMenuItem, Submenu } from "@tauri-apps/api/menu";
 import { TrayIcon } from "@tauri-apps/api/tray";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import { readText, writeText } from "@tauri-apps/plugin-clipboard-manager";
 import { exit } from "@tauri-apps/plugin-process";
 import {
@@ -500,4 +502,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         throw new Error("Failed to load default window icon");
     }
     await TrayIcon.new({ icon: icon, tooltip: "Keyboard App", menu: trayMenu });
+
+    requestAnimationFrame(() => {
+        const height = document.documentElement.scrollHeight;
+        getCurrentWindow().setSize(new LogicalSize(1200, height));
+    });
 });
