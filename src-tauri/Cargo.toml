@@ -1,6 +1,6 @@
 [package]
 name = "keyboard-app"
-version = "0.3.0"
+version = "0.4.0"
 description = "Cross-platform on-screen keyboard for different languages"
 authors = ["you"]
 edition = "2021"
