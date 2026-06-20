@@ -16,8 +16,14 @@ Or build locally
 
 ```shell
 git clone https://github.com/occamist/keyboard-app
-pnpm install # or npm install
-pnpm tauri build # or npm tauri build
+pnpm install && pnpm tauri build 
+```
+
+Or install via the provided script (Linux only)
+
+```shell
+git clone https://github.com/occamist/keyboard-app && cd keyboard-app
+chmod +x install.sh && ./install.sh
 ```
 
 ### FAQs
@@ -33,7 +39,3 @@ Linux(1st class), Windows, Macos
 - Why Tauri?
 
 Smallest bundles and easy to port across different platforms.
-
-- Do you have AUR package for Arch Linux?
-
-Of course, please up-vote [this](https://aur.archlinux.org/packages/keyboard-app) ;)
