@@ -10,16 +10,16 @@ Cross-platform on-screen keyboard for different languages, keyboard app supersed
 
 ### Getting Started
 
-Grab the app from latest releases [here](https://github.com/occamist/keyboard-app/releases)
+Grab the app from [the latest releases](https://github.com/occamist/keyboard-app/releases)
 
-Or build locally
+Or build locally from the source
 
 ```shell
 git clone https://github.com/occamist/keyboard-app
 pnpm install && pnpm tauri build 
 ```
 
-Or install via the provided script (Linux only)
+Or build and install as a Desktop app (Linux only)
 
 ```shell
 git clone https://github.com/occamist/keyboard-app && cd keyboard-app
@@ -34,7 +34,7 @@ German, Italian, Korean, Lao, Thai, Turkish, Vietnamese
 
 - What platforms are supported?
 
-Linux(1st class), Windows, Macos
+Linux (1st class), Windows, Macos
 
 - Why Tauri?
 
