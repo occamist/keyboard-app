@@ -1,0 +1,38 @@
+name: Nix
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # pnpmDeps.hash is a fixed-output hash over whatever pnpm version the nixpkgs
+  # in play provides. This flake locks nixos-unstable, but consumers routinely
+  # point us at a stable channel with `inputs.nixpkgs.follows`, which can resolve
+  # a different pnpm. Build both so a divergence fails here rather than in
+  # somebody's nixos-rebuild.
+  check:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: locked
+            override: ""
+          - name: nixos-26.05
+            override: "--override-input nixpkgs github:NixOS/nixpkgs/nixos-26.05"
+
+    name: nix flake check (${{ matrix.name }})
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - name: Build
+        run: nix flake check -L ${{ matrix.override }}
