@@ -12,19 +12,50 @@ Cross-platform on-screen keyboard for different languages, keyboard app supersed
 
 Grab the app from [the latest releases](https://github.com/occamist/keyboard-app/releases)
 
-Or build locally from the source
+Or build locally from the source by yourself
 
 ```shell
 git clone https://github.com/occamist/keyboard-app
 pnpm install && pnpm tauri build 
 ```
 
-Or build and install as a Desktop app (Linux only)
+### Nix
+
+Or run directly with Nix
 
 ```shell
-git clone https://github.com/occamist/keyboard-app && cd keyboard-app
-chmod +x install.sh && ./install.sh
+nix run github:occamist/keyboard-app
 ```
+
+Or add it as a flake input in your own `flake.nix` (NixOS)
+
+```nix
+{
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    keyboard-app = {
+      url = "github:occamist/keyboard-app";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+  };
+
+  outputs = { self, nixpkgs, keyboard-app, ... }@inputs: {
+    # ...
+  };
+}
+```
+
+then reference it in `environment.systemPackages`
+
+```nix
+{ pkgs, inputs, ... }:
+{
+  environment.systemPackages = [
+    inputs.keyboard-app.packages.${pkgs.stdenv.hostPlatform.system}.default
+  ];
+}
+```
+
 
 ### FAQs
 

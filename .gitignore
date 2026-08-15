@@ -13,6 +13,10 @@ dist-ssr
 *.local
 coverage/
 
+# Nix
+result
+result-*
+
 # Editor directories and files
 .vscode/
 .idea/
