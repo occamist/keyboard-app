@@ -24,7 +24,7 @@ let
 in
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "keyboard-app";
-  version = (builtins.fromTOML (builtins.readFile ../src-tauri/Cargo.toml)).package.version;
+  version = (fromTOML (builtins.readFile ../src-tauri/Cargo.toml)).package.version;
 
   # Everything except files that cannot affect the build. Excluding rather than
   # listing what to keep, so a new frontend config file is not silently dropped
@@ -206,7 +206,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     maintainers = [
       {
         name = "Talha Altınel";
-        email = "talhaaltinel@gmail.com";
+        email = "talhaaltinel@hotmail.com";
         github = "occamist";
         githubId = 22800416;
       }
