@@ -14,6 +14,10 @@
   libappindicator-gtk3,
   openssl,
   webkitgtk_4_1,
+  writeShellApplication,
+  nix,
+  gnused,
+  gnugrep,
 }:
 
 let
@@ -28,13 +32,66 @@ rustPlatform.buildRustPackage (finalAttrs: {
   cargoRoot = "src-tauri";
   buildAndTestSubdir = "src-tauri";
 
-  cargoHash = "sha256-4gzzDymBkfWqFmWuFMnjMZdYJKSgm1qk/H0fwK5+uDo=";
+  # Vendors straight from Cargo.lock's own per-crate checksums, so this
+  # never needs a manual hash bump when Rust dependencies change.
+  cargoLock.lockFile = ../src-tauri/Cargo.lock;
 
   pnpmDeps = fetchPnpmDeps {
     inherit (finalAttrs) pname version src;
     inherit pnpm;
     hash = "sha256-1zUsmzViGMT+tYndKiYUVlNvUrxInm+xXIctqN8012Y=";
     fetcherVersion = 4;
+  };
+
+  # Rust deps vendor from Cargo.lock directly (see cargoLock above) and never
+  # need a hash bump. pnpmDeps.hash above does, whenever pnpm-lock.yaml
+  # changes: run this to rewrite it in place.
+  #   nix run .#default.passthru.updateHashesScript
+  passthru.updateHashesScript = writeShellApplication {
+    name = "keyboard-app-update-hashes";
+    runtimeInputs = [
+      nix
+      gnused
+      gnugrep
+    ];
+    text = ''
+      repo_root="$(git rev-parse --show-toplevel)"
+      package_nix="$repo_root/nix/package.nix"
+      fake_hash="sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+
+      current_hash=$(sed -n 's/.*hash = "\(sha256-[^"]*\)";.*/\1/p' "$package_nix")
+      if [[ -z "$current_hash" ]]; then
+        echo "error: could not find pnpmDeps hash in $package_nix" >&2
+        exit 1
+      fi
+
+      # Anchored to the `hash = "...";` attribute context, not a bare literal-string
+      # substitution: this script's own source (embedded in the file it edits) also
+      # contains the fake_hash value as `fake_hash="..."`, which an unanchored sed
+      # would also match and corrupt.
+      sed -i "s|hash = \"$current_hash\";|hash = \"$fake_hash\";|" "$package_nix"
+
+      echo "Building with a fake hash to learn the real one..." >&2
+      build_output=$(cd "$repo_root" && nix build .#default -L 2>&1) && {
+        echo "error: build succeeded with a fake hash, which should be impossible" >&2
+        exit 1
+      } || true
+
+      real_hash=$(grep -oP 'got:\s+\K\S+' <<<"$build_output" | head -1)
+      if [[ -z "$real_hash" ]]; then
+        sed -i "s|hash = \"$fake_hash\";|hash = \"$current_hash\";|" "$package_nix"
+        echo "error: could not determine the real hash; build output:" >&2
+        echo "$build_output" >&2
+        exit 1
+      fi
+
+      sed -i "s|hash = \"$fake_hash\";|hash = \"$real_hash\";|" "$package_nix"
+      echo "Updated pnpmDeps hash to $real_hash" >&2
+
+      echo "Verifying build..." >&2
+      (cd "$repo_root" && nix build .#default -L)
+      echo "OK" >&2
+    '';
   };
 
   nativeBuildInputs = [
