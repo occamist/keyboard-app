@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { composeKorean } from "./korean-composer.ts";
 
+// For all of the tests, do refer to https://github.com/dzikoysk/khangul/blob/main/khangul/src/commonTest/kotlin/HangulContextTest.kt
 describe("Korean Composition", () => {
     describe("Basic syllable formation", () => {
         it("should compose ㅅ + ㅐ = 새", () => {
