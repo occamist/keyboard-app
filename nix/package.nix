@@ -3,7 +3,7 @@
   rustPlatform,
   cargo-tauri,
   nodejs_24,
-  pnpm_10,
+  pnpm_12,
   pnpmConfigHook,
   fetchPnpmDeps,
   pkg-config,
@@ -20,7 +20,12 @@
 }:
 
 let
-  pnpm = pnpm_10;
+  # Pinned to a major rather than tracking the top-level `pnpm`, so a nixpkgs
+  # default bump cannot change the resolver -- and therefore pnpmDeps.hash --
+  # underneath us.
+  #
+  # this single pin governs both the deps fetch and the build.
+  pnpm = pnpm_12;
 in
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "keyboard-app";
@@ -69,7 +74,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
       ];
     };
 
-    hash = "sha256-1zUsmzViGMT+tYndKiYUVlNvUrxInm+xXIctqN8012Y=";
+    hash = "sha256-KoMePep/ROgyxY4Wt6seA4hjak5X7dlug5+K/2HDdh4=";
     fetcherVersion = 4;
   };
 
